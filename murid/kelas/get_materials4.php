@@ -81,7 +81,90 @@ ORDER BY tanggal DESC";
     <!-- Tombol Cetak -->
     <button onclick="printTabel()" class="btn btn-primary mt-3">Cetak</button>
 
+    <style>
+        /* Hide print-only elements during normal viewing */
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+
+            /* Show print-only elements when printing */
+            .print-only {
+                display: block;
+            }
+
+            /* Hide header and footer */
+            @page {
+                margin: 2cm;
+                size: auto;
+                -webkit-print-color-adjust: exact;
+            }
+
+            /* Remove header/footer from the browser */
+            @page :first {
+                margin-top: 2cm;
+            }
+
+            @page :left {
+                margin-left: 2cm;
+            }
+
+            @page :right {
+                margin-right: 2cm;
+            }
+
+            /* Hide URL and page numbers */
+            @page :footer {
+                display: none;
+            }
+
+            @page :header {
+                display: none;
+            }
+
+            .watermark {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0.4;
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            .report-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .logo {
+                max-width: 100px;
+                height: auto;
+            }
+
+            .report-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin: 15px 0;
+            }
+        }
+    </style>
+
     <div id="printArea">
+        <!-- Print-only content -->
+        <div class="print-only">
+            <!-- Watermark -->
+            <div class="watermark">
+                <img src="<?php echo asset('img/logo.png'); ?>" alt="Watermark">
+            </div>
+
+            <!-- Report Header -->
+            <div class="report-header">
+                <img src="<?php echo asset('img/logo.png'); ?>" alt="Logo" class="logo">
+                <h1 class="report-title">Laporan Hasil Evaluasi Siswa<br>Global Intelligence Academy</h1>
+            </div>
+        </div>
         <div class="mt-4">
             <table class="table table-bordered">
                 <tbody>
@@ -199,73 +282,111 @@ ORDER BY tanggal DESC";
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-    <!-- Script untuk Cetak -->
     <script>
         function printTabel() {
             var printContents = document.getElementById('printArea').innerHTML;
             var originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-        }
-    </script>
 
-    <script>
-        // Ambil data dari PHP ke dalam JavaScript
-        var dataEvaluasi = [
-            <?php
-            mysqli_data_seek($resultEvaluasi, 0); // Reset hasil query
-            while ($evaluasi = $resultEvaluasi->fetch_assoc()) {
-                echo "{ x: '{$evaluasi['tanggal']}', y: {$evaluasi['evaluasi_total']} },";
-            }
-            ?>
-        ];
+            // Create a new style element for print-specific CSS
+            var printStyles = `
+            <style>
+                body { margin: 2cm; }
+                .watermark { 
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    opacity: 0.4;
+                    z-index: -1;
+                    pointer-events: none;
+                }
+                .report-header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+                .logo {
+                    max-width: 100px;
+                    height: auto;
+                }
+                .report-title {
+                    font-size: 18px;
+                    font-weight: bold;
+                    margin: 15px 0;
+                }
+                @media print {
+                    .btn { display: none; }
+                }
+            </style>
+        `;
 
-        var options = {
-            series: [{
-                name: "Evaluasi Nilai",
-                data: dataEvaluasi
-            }],
-            chart: {
-                type: 'line',
-                height: 350,
-                zoom: {
-                    enabled: true
-                }
-            },
-            dataLabels: {
-                enabled: true
-            },
-            stroke: {
-                curve: 'smooth'
-            },
-            title: {
-                text: 'Grafik Evaluasi Nilai',
-                align: 'left'
-            },
-            grid: {
-                row: {
-                    colors: ['#f3f3f3', 'transparent'], // Pola warna latar belakang
-                    opacity: 0.5
-                },
-            },
-            xaxis: {
-                type: 'category',
-                categories: dataEvaluasi.map(item => item.x),
-                title: {
-                    text: 'Tanggal'
-                }
-            },
-            yaxis: {
-                title: {
-                    text: 'Nilai Evaluasi'
-                }
-            }
+        document.body.innerHTML = printStyles + printContents;
+
+        // Remove default headers and footers
+        window.onbeforeprint = function () {
+            // Additional print preparations if needed
         };
 
-        var chart = new ApexCharts(document.querySelector("#orderStatisticsChart1"), options);
-        chart.render();
-    </script>
-    <?php
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
+</script>
+
+<script>
+    // Ambil data dari PHP ke dalam JavaScript
+    var dataEvaluasi = [
+        <?php
+        mysqli_data_seek($resultEvaluasi, 0); // Reset hasil query
+        while ($evaluasi = $resultEvaluasi->fetch_assoc()) {
+            echo "{ x: '{$evaluasi['tanggal']}', y: {$evaluasi['evaluasi_total']} },";
+        }
+        ?>
+    ];
+
+    var options = {
+        series: [{
+            name: "Evaluasi Nilai",
+            data: dataEvaluasi
+        }],
+        chart: {
+            type: 'line',
+            height: 350,
+            zoom: {
+                enabled: true
+            }
+        },
+        dataLabels: {
+            enabled: true
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        title: {
+            text: 'Grafik Evaluasi Nilai',
+            align: 'left'
+        },
+        grid: {
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // Pola warna latar belakang
+                opacity: 0.5
+            },
+        },
+        xaxis: {
+            type: 'category',
+            categories: dataEvaluasi.map(item => item.x),
+            title: {
+                text: 'Tanggal'
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Nilai Evaluasi'
+            }
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#orderStatisticsChart1"), options);
+    chart.render();
+</script>
+<?php
 }
 ?>

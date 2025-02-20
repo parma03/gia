@@ -388,9 +388,7 @@ if (isset($_POST['tambah_materi'])) {
                                                                         value="<?php echo $evaluasi['evaluasi_tugas'] ?? ''; ?>">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="evaluasi_total" class="form-label">Evaluasi
-                                                                        Total</label>
-                                                                    <input type="text" class="form-control"
+                                                                    <input type="hidden" class="form-control"
                                                                         name="evaluasi_total" id="evaluasi_total"
                                                                         value="<?php echo $evaluasi['evaluasi_total'] ?? ''; ?>"
                                                                         readonly>
