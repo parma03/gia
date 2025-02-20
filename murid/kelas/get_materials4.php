@@ -37,9 +37,9 @@ if (isset($_POST['id_kelas'], $_POST['id_murid'])) {
     $resultEvaluasi1 = $stmtEvaluasi1->get_result();
     $dataEvaluasi1 = $resultEvaluasi1->fetch_assoc();
 
-    // Ambil evaluasi
     $queryEvaluasi = "SELECT 
-    evaluasi_total, 
+    evaluasi_total,
+    evaluasi_tugas,
     DATE_FORMAT(tanggal, '%d-%m-%Y') as tanggal,
     (SELECT AVG(evaluasi_total) 
      FROM tb_evaluasi 
@@ -183,18 +183,6 @@ ORDER BY tanggal DESC";
                         </td>
                     </tr>
                     <tr>
-                        <th class="table-light">Nilai Kehadiran</th>
-                        <td>
-                            <?php echo $evaluasi_kehadiran; ?> <br>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="table-light">Nilai Tugas</th>
-                        <td>
-                            <?php echo $dataEvaluasi1['evaluasi_tugas']; ?> <br>
-                        </td>
-                    </tr>
-                    <tr>
                         <td>Chart</td>
                         <td>
                             <div id="orderStatisticsChart1" class="px-3"></div>
@@ -207,6 +195,7 @@ ORDER BY tanggal DESC";
                                 <table class="table table-sm table-bordered mb-0">
                                     <thead>
                                         <tr>
+                                            <th>Nilai Tugas</th>
                                             <th>Nilai Evaluasi</th>
                                             <th>Tanggal</th>
                                         </tr>
@@ -217,6 +206,7 @@ ORDER BY tanggal DESC";
                                         mysqli_data_seek($resultEvaluasi, 0);
                                         while ($evaluasi = $resultEvaluasi->fetch_assoc()) { ?>
                                             <tr>
+                                                <td><?php echo $evaluasi['evaluasi_tugas']; ?></td>
                                                 <td><?php echo $evaluasi['evaluasi_total']; ?></td>
                                                 <td><?php echo $evaluasi['tanggal']; ?></td>
                                             </tr>
