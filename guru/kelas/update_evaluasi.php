@@ -5,6 +5,7 @@ include '../../config/koneksi.php';
 $id_murid = $_POST['id_murid'];
 $id_kelas = $_POST['id_kelas'];
 $evaluasi_tugas = $_POST['evaluasi_tugas'];  // Nilai evaluasi tugas yang diinputkan
+$id_jawaban = $_POST['id_jawaban'];
 
 // Menghitung jumlah pertemuan dan kehadiran
 $queryPresensi = "SELECT COUNT(*) AS jumlah_pertemuan, 
@@ -42,17 +43,17 @@ $resultEvaluasi = $stmtEvaluasi->get_result();
 
 if ($resultEvaluasi->num_rows > 0) {
     // Data evaluasi sudah ada, lakukan update
-    $queryUpdate = "INSERT INTO tb_evaluasi (id_kelas_assesment, id_murid, evaluasi_tugas, evaluasi_kehadiran, evaluasi_total, tanggal) 
-                    VALUES (?, ?, ?, ?, ?, ?)";
+    $queryUpdate = "INSERT INTO tb_evaluasi (id_kelas_assesment, id_murid, evaluasi_tugas, evaluasi_kehadiran, evaluasi_total, tanggal, id_jawaban) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmtUpdate = $conn->prepare($queryUpdate);
-    $stmtUpdate->bind_param("iiidds", $id_kelas, $id_murid, $evaluasi_tugas, $evaluasi_kehadiran, $evaluasi_total, $tanggal);
+    $stmtUpdate->bind_param("iiiddsi", $id_kelas, $id_murid, $evaluasi_tugas, $evaluasi_kehadiran, $evaluasi_total, $tanggal, $id_jawaban);
     $stmtUpdate->execute();
 } else {
     // Data evaluasi belum ada, lakukan insert
-    $queryInsert = "INSERT INTO tb_evaluasi (id_kelas_assesment, id_murid, evaluasi_tugas, evaluasi_kehadiran, evaluasi_total, tanggal) 
-                    VALUES (?, ?, ?, ?, ?, ?)";
+    $queryInsert = "INSERT INTO tb_evaluasi (id_kelas_assesment, id_murid, evaluasi_tugas, evaluasi_kehadiran, evaluasi_total, tanggal, id_jawaban) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmtInsert = $conn->prepare($queryInsert);
-    $stmtInsert->bind_param("iiidds", $id_kelas, $id_murid, $evaluasi_tugas, $evaluasi_kehadiran, $evaluasi_total, $tanggal);
+    $stmtInsert->bind_param("iiiddsi", $id_kelas, $id_murid, $evaluasi_tugas, $evaluasi_kehadiran, $evaluasi_total, $tanggal, $id_jawaban);
     $stmtInsert->execute();
 }
 

@@ -48,7 +48,10 @@ if (isset($_POST['id_kelas'], $_POST['id_murid'])) {
                             <div class="mt-3">
                                 <h5>Jawaban</h5>
                                 <?php
-                                $queryJawaban = "SELECT * FROM tb_jawaban WHERE id_soal = ? AND id_murid = ?";
+                                $queryJawaban = "SELECT tb_jawaban.*, tb_evaluasi.evaluasi_total 
+                                FROM tb_jawaban 
+                                LEFT JOIN tb_evaluasi ON tb_jawaban.id_jawaban = tb_evaluasi.id_jawaban 
+                                WHERE tb_jawaban.id_soal = ? AND tb_jawaban.id_murid = ?";
                                 $stmtJawaban = $conn->prepare($queryJawaban);
                                 $stmtJawaban->bind_param("ii", $id_soal, $id_murid);
                                 $stmtJawaban->execute();
@@ -57,7 +60,16 @@ if (isset($_POST['id_kelas'], $_POST['id_murid'])) {
                                 if ($jawabanResult->num_rows > 0) {
                                     while ($jawaban = $jawabanResult->fetch_assoc()) {
                                         echo '<div class="d-flex align-items-center">';
-                                        echo '<p>' . $jawaban['nama_file'] . '</p> &nbsp;&nbsp;&nbsp;';
+                                        echo '<p>' . htmlspecialchars($jawaban['nama_file'], ENT_QUOTES, 'UTF-8') . '</p>';
+
+                                        // Menampilkan Evaluasi Nilai
+                                        if (!is_null($jawaban['evaluasi_total'])) {
+                                            echo '<span class="ms-2 badge bg-info">Nilai: ' . number_format($jawaban['evaluasi_total'], 2) . '</span>';
+                                        } else {
+                                            echo '<span class="ms-2 badge bg-warning">Belum Dinilai</span>';
+                                        }
+
+                                        echo '&nbsp;&nbsp;&nbsp;';
                                         echo '<button class="btn btn-danger" onclick="deleteJawaban(' . $jawaban['id_jawaban'] . ')">Hapus</button>';
                                         echo '</div>';
                                     }
@@ -88,7 +100,7 @@ if (isset($_POST['id_kelas'], $_POST['id_murid'])) {
                 $(document).ready(function () {
                     $(document).off('submit', 'form[id^="uploadJawabanForm"]').on('submit', 'form[id^="uploadJawabanForm"]', function (e) {
                         e.preventDefault();
-                        
+
                         let form = $(this);
                         let formData = new FormData(this);
 

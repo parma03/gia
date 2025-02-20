@@ -342,6 +342,18 @@ if (isset($_POST['tambah_materi'])) {
                                                 aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
+                                                        <?php
+                                                        $queryJawaban = "SELECT * FROM tb_jawaban
+                                                            LEFT JOIN tb_soal ON tb_jawaban.id_soal = tb_soal.id_soal
+                                                            WHERE tb_soal.id_kelas_assesment = ? AND tb_jawaban.id_murid = ?
+                                                            AND tb_jawaban.id_jawaban NOT IN (
+                                                                SELECT id_jawaban FROM tb_evaluasi WHERE id_murid = ? AND id_kelas_assesment = ?
+                                                            )";
+                                                        $stmtJawaban = $conn->prepare($queryJawaban);
+                                                        $stmtJawaban->bind_param("iiii", $id_kelas, $id_murid, $id_murid, $id_kelas);
+                                                        $stmtJawaban->execute();
+                                                        $resultJawaban = $stmtJawaban->get_result();
+                                                        ?>
                                                         <form action="update_evaluasi.php" method="POST">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title">Tambah Nilai Evaluasi</h5>
@@ -353,6 +365,21 @@ if (isset($_POST['tambah_materi'])) {
                                                                     value="<?php echo $id_murid; ?>">
                                                                 <input type="hidden" name="id_kelas"
                                                                     value="<?php echo $id_kelas; ?>">
+
+                                                                <div class="form-floating form-floating-custom mb-3">
+                                                                    <select class="form-select" id="selectFloatingLabel"
+                                                                        name="id_jawaban">
+                                                                        <option value="" disabled>Pilih
+                                                                            Jawaban</option>
+                                                                        <?php
+                                                                        while ($jawaban = $resultJawaban->fetch_assoc()) {
+                                                                            echo '<option value="' . $jawaban['id_jawaban'] . '">' . htmlspecialchars($jawaban['nama_file'], ENT_QUOTES, 'UTF-8') . '</option>';
+                                                                        }
+                                                                        ?>
+                                                                    </select>
+                                                                    <label for="selectFloatingLabel">Pilih
+                                                                        Jawaban</label>
+                                                                </div>
                                                                 <div class="mb-3">
                                                                     <label for="evaluasi_tugas" class="form-label">Evaluasi
                                                                         Tugas</label>
@@ -439,10 +466,12 @@ if (isset($_POST['tambah_materi'])) {
                                     $nama_soal = $soal['nama_soal'];
 
                                     // Query untuk mendapatkan murid yang telah mengunggah jawaban untuk soal ini
-                                    $queryJawaban = "SELECT tb_murid.nama, tb_jawaban.file_jawaban AS file_jawaban 
-                            FROM tb_jawaban 
-                            INNER JOIN tb_murid ON tb_jawaban.id_murid = tb_murid.id_murid 
-                            WHERE tb_jawaban.id_soal = ?";
+                                    $queryJawaban = "SELECT tb_murid.nama, tb_jawaban.file_jawaban AS file_jawaban, tb_evaluasi.evaluasi_total 
+                                                        FROM tb_jawaban 
+                                                        INNER JOIN tb_murid ON tb_jawaban.id_murid = tb_murid.id_murid 
+                                                        LEFT JOIN tb_evaluasi ON tb_jawaban.id_jawaban = tb_evaluasi.id_jawaban
+                                                        WHERE tb_jawaban.id_soal = ?";
+
                                     $stmtJawaban = $conn->prepare($queryJawaban);
                                     $stmtJawaban->bind_param("i", $id_soal);
                                     $stmtJawaban->execute();
@@ -465,6 +494,7 @@ if (isset($_POST['tambah_materi'])) {
                                                             <tr>
                                                                 <th>Nama Murid</th>
                                                                 <th>File Jawaban</th>
+                                                                <th>Evaluasi Nilai</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -478,6 +508,9 @@ if (isset($_POST['tambah_materi'])) {
                                                                                 target="_blank">
                                                                                 <?php echo htmlspecialchars($jawaban['file_jawaban'], ENT_QUOTES, 'UTF-8'); ?>
                                                                             </a>
+                                                                        </td>
+                                                                        <td>
+                                                                            <?php echo $jawaban['evaluasi_total'] ?? 'Belum Input Nilai'; ?>
                                                                         </td>
                                                                     </tr>
                                                                 <?php }

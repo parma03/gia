@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 20, 2025 at 07:08 AM
+-- Generation Time: Feb 20, 2025 at 11:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -54,17 +54,17 @@ CREATE TABLE `tb_evaluasi` (
   `evaluasi_total` varchar(255) DEFAULT NULL,
   `id_kelas_assesment` bigint(11) UNSIGNED NOT NULL,
   `id_murid` bigint(11) UNSIGNED NOT NULL,
-  `tanggal` date DEFAULT NULL
+  `tanggal` date DEFAULT NULL,
+  `id_jawaban` bigint(11) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tb_evaluasi`
 --
 
-INSERT INTO `tb_evaluasi` (`id_evaluasi`, `evaluasi_tugas`, `evaluasi_kehadiran`, `evaluasi_total`, `id_kelas_assesment`, `id_murid`, `tanggal`) VALUES
-(13, '65', '100', '75.5', 29, 3, '2025-02-01'),
-(14, '44', '11', '13.4', 29, 3, '2025-03-24'),
-(21, '90', '75', '85.5', 29, 3, '2025-02-19');
+INSERT INTO `tb_evaluasi` (`id_evaluasi`, `evaluasi_tugas`, `evaluasi_kehadiran`, `evaluasi_total`, `id_kelas_assesment`, `id_murid`, `tanggal`, `id_jawaban`) VALUES
+(23, '20', '75', '36.5', 29, 3, '2025-02-20', 22),
+(24, '100', '75', '92.5', 29, 3, '2025-02-20', 23);
 
 -- --------------------------------------------------------
 
@@ -483,7 +483,7 @@ ALTER TABLE `tb_admin`
 -- AUTO_INCREMENT for table `tb_evaluasi`
 --
 ALTER TABLE `tb_evaluasi`
-  MODIFY `id_evaluasi` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_evaluasi` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `tb_guru`
